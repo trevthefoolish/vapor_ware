@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Ecclesiastes 1:1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .container {
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Timeline-controlled elements */
+    .el {
+      position: absolute;
+      will-change: transform, opacity;
+    }
+
+    /* Typography - increased 10% */
+    .title-en {
+      font-size: clamp(24px, 6vw, 35px);
+      font-weight: 300;
+      color: #e8e4dc;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .title-he {
+      font-size: clamp(48px, 12vw, 75px);
+      font-weight: 400;
+      color: #daa520;
+      direction: rtl;
+      position: relative;
+      padding: 8px 16px 12px;
+      cursor: pointer;
+    }
+
+    /* Verse */
+    .verse {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: min(90vw, 600px);
+      padding: 0 12px;
+    }
+
+    .verse-he {
+      direction: rtl;
+      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0 clamp(4px, 1.5vw, 10px);
+      row-gap: clamp(28px, 6vw, 38px);
+    }
+
+    .word {
+      position: relative;
+      padding: 2px 4px;
+      color: #daa520;
+      font-size: clamp(24px, 6vw, 33px);
+      font-weight: 400;
+      cursor: pointer;
+    }
+
+    .verse-en {
+      font-size: clamp(17px, 4.2vw, 22px);
+      font-weight: 300;
+      font-style: italic;
+      color: #e8e4dc;
+      line-height: 1.8;
+      margin-top: clamp(16px, 4vw, 28px);
+      text-align: center;
+    }
+
+    /* Meaning - tucked right under the word */
+    .meaning {
+      position: absolute;
+      left: 50%;
+      top: 100%;
+      transform: translateX(-50%) translateY(2px);
+      font-size: clamp(10px, 2.2vw, 13px);
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(232, 228, 220, 0.85);
+      white-space: nowrap;
+      direction: ltr;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Title meaning slightly larger */
+    .title-he .meaning {
+      font-size: clamp(13px, 2.8vw, 17px);
+    }
+    
+    @keyframes meaningRevealTitle {
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(-3px) scale(0.96);
+      }
+      50% { 
+        opacity: 0.9;
+        transform: translateX(-50%) translateY(2px) scale(1.01);
+      }
+      75% {
+        transform: translateX(-50%) translateY(0px) scale(1);
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(4px) scale(1);
+      }
+    }
+
+    /* Organic fade-rise animation */
+    @keyframes meaningReveal {
+      0% { 
+        opacity: 0; 
+        transform: translateX(-50%) translateY(-3px) scale(0.96);
+      }
+      50% { 
+        opacity: 0.9;
+        transform: translateX(-50%) translateY(1px) scale(1.01);
+      }
+      75% {
+        transform: translateX(-50%) translateY(-0.5px) scale(1);
+      }
+      100% { 
+        opacity: 1; 
+        transform: translateX(-50%) translateY(2px) scale(1);
+      }
+    }
+
+    .word:hover .meaning,
+    .word.tapped .meaning {
+      animation: meaningReveal 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    
+    .title-he:hover .meaning,
+    .title-he.tapped .meaning {
+      animation: meaningRevealTitle 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Slot where קֹהֶלֶת lands */
+    .word-slot {
+      display: inline-block;
+      width: 0;
+    }
+
+    /* Progress indicator */
+    .progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background: rgba(218, 165, 32, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="el" id="elEn"><span class="title-en">Ecclesiastes</span></div>
+    
+    <div class="el" id="elHe">
+      <span class="title-he">קֹהֶלֶת<span class="meaning">the Teacher</span></span>
+    </div>
+    
+    <div class="el" id="elVerse">
+      <div class="verse">
+        <div class="verse-he">
+          <span class="word">דִּבְרֵי<span class="meaning">words of</span></span>
+          <span class="word-slot" id="qoheletSlot"></span>
+          <span class="word">בֶּן<span class="meaning">son of</span></span>
+          <span class="word">דָּוִד<span class="meaning">David</span></span>
+          <span class="word">מֶלֶךְ<span class="meaning">king</span></span>
+          <span class="word">בִּירוּשָׁלָֽ͏ִם<span class="meaning">in Jerusalem</span></span>
+        </div>
+        <p class="verse-en">The words of the Teacher, son of David, king in Jerusalem</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="progress" id="prog"></div>
+
+  <script>
+    // === TIMELINE ENGINE ===
+    const $ = id => document.getElementById(id);
+    const elEn = $('elEn'), elHe = $('elHe'), elVerse = $('elVerse'), prog = $('prog');
+    const slot = $('qoheletSlot');
+    
+    let current = 0, target = 0;
+    const LERP = 0.085;
+    const ANCHORS = [0, 0.5, 1];
+    
+    // Target position for קֹהֶלֶת journey
+    let targetX = 0, targetY = 0, targetScale = 0.44;
+    let slotWidth = 0;
+
+    function calcTarget() {
+      // Reset transforms to measure neutral positions
+      const oldHeTransform = elHe.style.transform;
+      const oldVerseTransform = elVerse.style.transform;
+      const oldVerseOpacity = elVerse.style.opacity;
+      const oldSlotWidth = slot.style.width;
+      
+      elHe.style.transform = 'none';
+      elVerse.style.transform = 'none';
+      elVerse.style.opacity = '1';
+      
+      // Measure title
+      const titleHeEl = elHe.querySelector('.title-he');
+      const titleHeRect = titleHeEl.getBoundingClientRect();
+      
+      // Calculate scale ratio (verse word size / title size)
+      const verseWordSize = parseFloat(getComputedStyle(document.querySelector('.word')).fontSize);
+      const titleSize = parseFloat(getComputedStyle(titleHeEl).fontSize);
+      targetScale = verseWordSize / titleSize;
+      
+      // Set slot width to accommodate the scaled word
+      slotWidth = titleHeRect.width * targetScale;
+      slot.style.width = slotWidth + 'px';
+      
+      // Force reflow
+      slot.offsetHeight;
+      
+      // Get slot position
+      const slotRect = slot.getBoundingClientRect();
+      
+      // Calculate offset from title center to slot center
+      const titleCenterX = titleHeRect.left + titleHeRect.width / 2;
+      const titleCenterY = titleHeRect.top + titleHeRect.height / 2;
+      const slotCenterX = slotRect.left + slotRect.width / 2;
+      const slotCenterY = slotRect.top + slotRect.height / 2;
+      
+      targetX = slotCenterX - titleCenterX;
+      targetY = slotCenterY - titleCenterY;
+      
+      // Restore
+      elHe.style.transform = oldHeTransform;
+      elVerse.style.transform = oldVerseTransform;
+      elVerse.style.opacity = oldVerseOpacity;
+      slot.style.width = oldSlotWidth;
+    }
+
+    // Keyframes: { progress: [opacity, scale, y, x] }
+    const K = {
+      en: {
+        0:    [1, 1, 0, 0],
+        0.3:  [1, 1, -40, 0],
+        0.5:  [1, 1, -55, 0],
+        0.7:  [0.3, 0.97, -65, 0],
+        1:    [0, 0.94, -75, 0]
+      },
+      verse: {
+        0:    [0, 1.05, 40, 0],
+        0.5:  [0, 1.03, 30, 0],
+        0.65: [0, 1.02, 18, 0],
+        0.75: [0.5, 1.01, 10, 0],
+        0.85: [0.8, 1, 5, 0],
+        0.95: [0.95, 1, 1, 0],
+        1:    [1, 1, 0, 0]
+      }
+    };
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+    function getVal(kf, p, i) {
+      const pts = Object.keys(kf).map(Number).sort((a,b) => a - b);
+      let lo = pts[0], hi = pts[pts.length - 1];
+      for (let j = 0; j < pts.length - 1; j++) {
+        if (p >= pts[j] && p <= pts[j + 1]) { lo = pts[j]; hi = pts[j + 1]; break; }
+      }
+      const range = hi - lo || 1;
+      const t = (p - lo) / range;
+      return lerp(kf[lo][i], kf[hi][i], ease(t));
+    }
+
+    function apply(el, kf, p) {
+      const o = getVal(kf, p, 0);
+      const s = getVal(kf, p, 1);
+      const y = getVal(kf, p, 2);
+      const x = getVal(kf, p, 3);
+      el.style.opacity = o;
+      el.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      el.style.pointerEvents = o > 0.5 ? 'auto' : 'none';
+    }
+    
+    // The ONE קֹהֶלֶת: starts as title, ends in verse slot
+    function applyHe(p) {
+      let o, s, x, y;
+      
+      if (p <= 0.2) {
+        // Fade in
+        const t = p / 0.2;
+        o = ease(t);
+        s = lerp(1.1, 1, ease(t));
+        y = lerp(28, 20, ease(t));
+        x = 0;
+      } else if (p <= 0.5) {
+        // Hold at center
+        o = 1;
+        s = 1;
+        y = lerp(20, 15, (p - 0.2) / 0.3);
+        x = 0;
+      } else {
+        // Journey to slot (0.5 -> 1)
+        const journey = (p - 0.5) / 0.5;
+        const ej = ease(journey);
+        
+        o = 1; // Always visible — no fade!
+        s = lerp(1, targetScale, ej);
+        y = lerp(15, targetY, ej);
+        x = lerp(0, targetX, ej);
+      }
+      
+      elHe.style.opacity = o;
+      elHe.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+      elHe.style.pointerEvents = o > 0.5 ? 'auto' : 'none';
+    }
+
+    function render() {
+      const d = target - current;
+      current = Math.abs(d) > 0.0001 ? current + d * LERP : target;
+      current = Math.max(0, Math.min(1, current));
+      
+      apply(elEn, K.en, current);
+      applyHe(current);
+      apply(elVerse, K.verse, current);
+      
+      // Open slot as word approaches (0.6 -> 1)
+      const slotProgress = Math.max(0, (current - 0.6) / 0.4);
+      slot.style.width = (slotWidth * ease(slotProgress)) + 'px';
+      
+      prog.style.width = `${current * 100}%`;
+      requestAnimationFrame(render);
+    }
+
+    function snap() {
+      let best = ANCHORS[0], dist = Math.abs(target - best);
+      for (const a of ANCHORS) {
+        const d = Math.abs(target - a);
+        if (d < dist) { dist = d; best = a; }
+      }
+      target = best;
+    }
+
+    function next() {
+      for (const a of ANCHORS) if (a > target + 0.01) { target = a; return; }
+    }
+
+    function prev() {
+      for (let i = ANCHORS.length - 1; i >= 0; i--) 
+        if (ANCHORS[i] < target - 0.01) { target = ANCHORS[i]; return; }
+    }
+
+    // === INPUT ===
+    let tx = 0, ty = 0, tp = 0;
+
+    document.addEventListener('touchstart', e => {
+      tx = e.touches[0].clientX; ty = e.touches[0].clientY; tp = target;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', e => {
+      const dx = e.touches[0].clientX - tx, dy = e.touches[0].clientY - ty;
+      const delta = Math.abs(dy) > Math.abs(dx) ? -dy : -dx;
+      target = Math.max(0, Math.min(1, tp + delta / 350));
+    }, { passive: true });
+
+    document.addEventListener('touchend', snap, { passive: true });
+
+    let wheelTimer;
+    document.addEventListener('wheel', e => {
+      e.preventDefault();
+      const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      target = Math.max(0, Math.min(1, target + d / 600));
+      clearTimeout(wheelTimer);
+      wheelTimer = setTimeout(snap, 150);
+    }, { passive: false });
+
+    document.addEventListener('keydown', e => {
+      if (['ArrowDown', 'ArrowRight', ' '].includes(e.key)) { e.preventDefault(); next(); }
+      else if (['ArrowUp', 'ArrowLeft'].includes(e.key)) { e.preventDefault(); prev(); }
+    });
+
+    // === INIT ===
+    apply(elEn, K.en, 0);
+    elHe.style.opacity = 0;
+    elHe.style.transform = 'translateY(28px) scale(1.1)';
+    apply(elVerse, K.verse, 0);
+    slot.style.width = '0';
+    
+    // Calculate target after layout settles
+    setTimeout(() => {
+      calcTarget();
+      requestAnimationFrame(render);
+    }, 50);
+    
+    // Recalculate on resize
+    window.addEventListener('resize', calcTarget);
+
+    // === MOBILE TAP FOR MEANINGS ===
+    let lastTap = null;
+    document.querySelectorAll('.title-he, .word').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        if (lastTap && lastTap !== el) lastTap.classList.remove('tapped');
+        el.classList.toggle('tapped');
+        lastTap = el.classList.contains('tapped') ? el : null;
+      });
+    });
+    document.addEventListener('click', () => {
+      if (lastTap) { lastTap.classList.remove('tapped'); lastTap = null; }
+    });
+  </script>
+</body>
+</html>
